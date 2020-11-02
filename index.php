@@ -9,8 +9,8 @@ if ($_POST['city']) {
     '&appid=' .
     constant('APIKEY');
 
-  $apiData = file_get_contents($url);
-  $data = json_decode($apiData, true);
+  $apiData = file_get_contents($url); // Call the API
+  $data = json_decode($apiData, true); // Converts the json data to arrays
 }
 ?>
 
@@ -43,42 +43,52 @@ if ($_POST['city']) {
 <hr/>
 
     <?php
+    // Now checks if the form is submitted and the API data was fetched successfully
     if ($_POST['city'] && $apiData) {
-      echo '<h3>' .
-        ucwords($_POST['city']) .
-        ', ' .
-        $data['sys']['country'] .
-        '<h3>';
+      $cityName = ucwords($_POST['city']); // Converts the city name to uppercase
+      $country = $data['sys']['country'];
+
+      // I use round() function in a few vars to round temperatures to integers
+
+      $cityTemp = round($data['main']['temp']) . '°'; // City main temperature (in Celcius)
+      $cityWeather = $data['weather']['main']; // City main weather
+      $cityMaxTemp = round($data['main']['temp_max']) . '°'; // City max temperature (in Celcius)
+      $cityMinTemp = round($data['main']['temp_min']) . '°'; // City min temperature (in Celcius)
+      $cityPressure = $data['main']['pressure'] . 'hPa'; // City pressure (in hPa)
+      $cityHumidity = $data['main']['humidity'] . '%'; // CIty humidity (in percentage)
+
+      echo '<h3>' . $cityName . ', ' . $country . '<h3>';
 
       echo '<h4 class=""><svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-thermometer-half" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
         <path fill-rule="evenodd" d="M6 2a2 2 0 1 1 4 0v7.627a3.5 3.5 0 1 1-4 0V2zm2-1a1 1 0 0 0-1 1v7.901a.5.5 0 0 1-.25.433A2.499 2.499 0 0 0 8 15a2.5 2.5 0 0 0 1.25-4.666.5.5 0 0 1-.25-.433V2a1 1 0 0 0-1-1z"/>
         <path d="M8.25 2a.25.25 0 0 0-.5 0v9.02a1.514 1.514 0 0 1 .5 0V2z"/>
         <path d="M9.5 12.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
       </svg> ' .
-        round($data['main']['temp']) .
-        '°</h4>';
+        $cityTemp .
+        '</h4>';
 
-      echo '<strong>' . $data['weather']['main'] . '</strong>';
+      echo '<strong>' . $cityWeather . '</strong>';
 
       echo '       <p class="pt-3">Max. temp: ' .
-        round($data['main']['temp_max']) .
-        '°</p>
+        $cityMaxTemp .
+        '</p>
       <p> Min. temp: ' .
-        round($data['main']['temp_min']) .
-        '°</p>
+        $cityMinTemp .
+        '</p>
       <p> Pressure: ' .
-        $data['main']['pressure'] .
-        'hPa</p>
+        $cityPressure .
+        '</p>
       <p> Humidity: ' .
-        $data['main']['humidity'] .
-        '%</p>';
+        $cityHumidity .
+        '</p>';
 
       echo "       <hr>";
     }
+    // If API data was not fetched successfully, it shows an error message
     if ($apiData === false) {
       echo '<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-exclamation-circle-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
       <path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
-    </svg> City not found<hr>';
+    </svg> City not found or API not working<hr>';
     }
     ?>
 
